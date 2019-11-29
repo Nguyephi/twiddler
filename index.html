@@ -1,27 +1,144 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <script src="jquery.js"></script>
-    <script src="data_generator.js"></script>
-  </head>
-  <body>
-    <script>
 
-      $(document).ready(function(){
-        var $body = $('body');
+<head>
+  <script src="moment.min.js"></script>
+  <script src="jquery.js"></script>
+  <script src="data_generator.js"></script>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.0/css/bootstrap.min.css"
+    integrity="sha384-SI27wrMjH3ZZ89r4o+fGIJtnzkAnFs3E4qz9DIYioCQ5l9Rd/7UAa8DHcaL8jkWt" crossorigin="anonymous">
+  <link rel='stylesheet' type='text/css' href='style.css' />
+</head>
+
+<body class='d-flex'>
+  <!-- left side nav -->
+  <nav class='nav flex-column alt-font position-fixed'>
+    <div class='nav-container'>
+      <a class="nav-link active" href="/">Twitter logo</a>
+      <a class="nav-link" href="#"><span class='alt-font'>Home</span></a>
+      <a class="nav-link" href="#"><span class='alt-font'>Explore</span></a>
+      <a class="nav-link" href="#"><span class='alt-font'>Notifications</span></a>
+      <a class="nav-link" href="#"><span class='alt-font'>Messages</span></a>
+      <a class="nav-link" href="#"><span class='alt-font'>Bookmarks</span></a>
+      <a class="nav-link" href="#"><span class='alt-font'>List</span></a>
+      <a class="nav-link" href="#"><span class='alt-font'>Profile</span></a>
+      <a class="nav-link" href="#"><span class='alt-font'>More</span></a>
+      <button id='nav-tweet-btn' class='tweet-btn'><span class='alt-font'>Tweet</span></button>
+    </div>
+  </nav>
+
+  <!--  right side content  -->
+  <div class='right-side-container d-flex'>
+    <!-- body -->
+    <div class='body'>
+      <div class='body-header body-header-home mouse-pointer more-padding'>
+        <p class='alt-font'>Home</p>
+      </div>
+      <div class='body-input'>
+        <div class='w-100'>
+          <div class='more-padding'>
+            <div class='d-flex less-margin'>
+              <div>
+                <img height='49px' width='49px' src='https://pbs.twimg.com/media/C8QsNInXUAAyjZQ.jpg' alt='user-avi'
+                  class='avi more-margin' />
+              </div>
+              <div class='more-margin w-100'>
+                <div class='tweet-input-container'>
+                  <textarea class='tweet-input' placeholder="What's happening?"></textarea>
+                </div>
+                <div class='tweet-options-container'>
+                  <div class='tweet-option-left'></div>
+                  <div class="tweet-option-right">
+                    <button disabled class='tweet-btn alt-font' onclick="">Tweet</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class='tweets'></div>
+    </div>
+
+    <!--  news feed  -->
+    <div class='news'>
+      <input type='text' placeholder='Search Twitter' class='search-bar' />
+    </div>
+  </div>
+  <script>
+
+
+    $(document).ready(function () {
+      var $body = $('.tweets');
+      $body.html('');
+
+      var index = streams.home.length - 1;
+      while (index >= 0) {
+        var tweet = streams.home[index];
+        var $tweet = $(`<div></div>`);
+        var $user = $(`<a></a>`);
+        $tweet.addClass(`tweetPost`)
+        $user.addClass(`${tweet.user}`)
+        $user.text(`@${tweet.user}`)
+        timeCreated = moment(tweet.created_at).format("h:mm a · MMM D, YYYY")
+        $tweet.text(': ' + tweet.message + timeCreated
+        );
+        $user.prependTo($tweet);
+        $tweet.appendTo($body);
+        index -= 1;
+      }
+
+      $('.tweetPost').click(function (e) {
+        var $body = $('.tweets');
         $body.html('');
-
-        var index = streams.home.length - 1;
-        while(index >= 0){
-          var tweet = streams.home[index];
-          var $tweet = $('<div></div>');
-          $tweet.text('@' + tweet.user + ': ' + tweet.message);
-          $tweet.appendTo($body);
-          index -= 1;
+        for (let regUser in streams.users) {
+          if (e.target.className === regUser) {
+            for (let i = 0; i < streams.users[regUser].length; i++) {
+              let tweet = streams.users[regUser][i];
+              console.log(tweet)
+              var $tweet = $(`<div></div>`);
+              var $user = $(`<a></a>`);
+              $tweet.addClass(`tweetPost`)
+              $user.addClass(`${regUser}`)
+              $user.text(`@${regUser}`)
+              timeCreated = moment(tweet.created_at).format("h:mm a · MMM D, YYYY");
+              $tweet.text(': ' + tweet.message + timeCreated
+              );
+              $user.prependTo($tweet);
+              $tweet.appendTo($body);
+            }
+          }
         }
+      })
 
+      $('.tweet-input').keyup(function (e) {
+        if (e.target.value) {
+          $('.tweet-btn').prop('disabled', false);
+        }
+        if (e.target.value.length === 0) $('.tweet-btn').prop('disabled', true);
       });
 
-    </script>
-  </body>
+      $('.tweet-btn').click(function (e) {
+        e.preventDefault();
+        let newPost = {};
+        newPost.tweet = $('.tweet-input').val();
+        var $user = $(`<a></a>`);
+        $user.attr('onclick', `showUserTweet(${tweet.user})`)
+        $user.text(`@${tweet.user}`)
+        newPost.created_at = new Date
+        let timeCreated = moment(newPost.created_at).format("h:mm a · MMM D, YYYY")
+        var $tweet = $(`<div></div>`);
+        $tweet.addClass('tweet-li-item');
+        $tweet.text(': ' + newPost.tweet + " " + timeCreated);
+        $user.prependTo($tweet)
+        $tweet.prependTo($body)
+        $('.tweet-input').val('')
+      })
+
+    });
+
+  </script>
+</body>
+
 </html>
